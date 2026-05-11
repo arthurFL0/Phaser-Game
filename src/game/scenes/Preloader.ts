@@ -39,6 +39,9 @@ export class Preloader extends Scene
         this.load.spritesheet('boris', 'BorisAnim.png', {frameWidth: 14, frameHeight: 29});
         this.load.audio('puloMP3','/sfx/pulo.mp3');
         this.load.audio('andarMP3','/sfx/passo.mp3');
+        this.load.image('montanha','montanha.png');
+        this.load.image('ceu', 'ceu.png');
+        this.load.bitmapFont('milky-font', 'font.png', 'font.xml');
 
     }
 
