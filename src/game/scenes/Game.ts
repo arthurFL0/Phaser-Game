@@ -57,9 +57,14 @@ export class Game extends Scene
 
     }
 
-    update (){
+    update (time: number, delta: number){
         const cameraX = this.cameras.main.scrollX;
-        this.ceu.tilePositionX = Math.round(cameraX * 0.2);
-        this.montanha.tilePositionX = Math.round(cameraX * 0.4);
+        
+        // Céu em efeito parallax com a câmera E um movimento extra baseado no tempo
+        // 0.05 é a velocidade do parallax, 0.01 é a velocidade do baseada no relógio interno de atualização 
+        this.ceu.tilePositionX = (cameraX * 0.05) + (time * 0.01); 
+        
+        // A montanha continua com o efeito parallax normal
+        this.montanha.tilePositionX = Math.round(cameraX * 0.1);
     }
 }
