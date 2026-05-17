@@ -9,11 +9,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private puloForca: number = 150;
     private carregarPuloMax: number = 280;
     private pixelAzul: Phaser.GameObjects.Rectangle;
-    private andarSFX: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound = this.scene.sound.add('andarMP3');
+    // private andarSFX: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound = this.scene.sound.add('andarMP3');
+    private puloSFX: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
     private LIMITE_PULO_1 : number = 300;
     private LIMITE_PULO_2 : number = 500;
     private LIMITE_PULO_3 : number = 800;
-    private diferencaLagrimasPe: number = 0;
+    declare body: Phaser.Physics.Arcade.Body;
+    // private diferencaLagrimasPe: number = 0;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'boris');
@@ -25,7 +27,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.pixelAzul.setVisible(false);
         
         this.setScale(3);
-        this.setBounce(0.2);
+        // this.setBounce(0.2);
         this.setCollideWorldBounds(true);
         this.body!.setSize(5, 29);
         this.body!.setOffset(6, 0);
@@ -38,6 +40,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.cursors = {} as Phaser.Types.Input.Keyboard.CursorKeys;
         }
 
+        this.puloSFX = this.scene.sound.add('puloMP3');
+        this.puloSFX.setVolume(0.2);
         // this.andarSFX.setVolume(0.4);
     }
 
@@ -54,7 +58,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.andarParaDireita();
         } else if (this.cursors.left?.isDown) {
             this.andarParaEsquerda();
-        } else if (this.cursors.down?.isDown && this.body?.touching.down) {
+        } else if (this.cursors.down?.isDown && this.body.onFloor()) {
             const tempoPressionado = this.cursors.down.getDuration();
             this.carregandoPulo = true;
             if(tempoPressionado >= this.LIMITE_PULO_3){
@@ -63,14 +67,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.anims.play('carregar_pulo');
             }
 
-        } else if(Phaser.Input.Keyboard.JustUp(this.cursors.down) && this.body!.touching.down && this.carregandoPulo) {
+        } else if(Phaser.Input.Keyboard.JustUp(this.cursors.down) && this.body.onFloor() && this.carregandoPulo) {
                 // this.pixelAzul.setVisible(false);
-                this.scene.sound.play('puloMP3');
+                this.puloSFX.play();
                 const tempoPressionado = this.cursors.down.duration;
                 this.carregandoPulo = false;
                 this.anims.play('pulo');
                 this.setVelocityY(- this.calcularPulo(tempoPressionado));
-        } else if (this.body!.touching.down) {
+        } else if (this.body.onFloor()) {
             this.anims.stop();
             this.setFrame(0);
         } else if (this.anims.currentAnim?.key !== 'carregar_pulo' && this.anims.currentAnim?.key !== 'pulo') {
@@ -78,8 +82,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setFrame(0);
         }
 
-        if (this.cursors.up?.isDown && this.body!.touching.down) {
-            this.scene.sound.play('puloMP3');
+        if (this.cursors.up?.isDown && this.body.onFloor()) {
+            this.puloSFX.play();
             this.anims.play('pulo');
             this.setVelocityY(- this.puloForca);
         }
@@ -93,7 +97,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private andarParaDireita() {
         this.carregandoPulo = false;
         this.setVelocityX(this.velX);
-        if (this.body!.touching.down) {
+        if (this.body!.onFloor()) {
             // if (!this.andarSFX.isPlaying) this.andarSFX.play();
             this.anims.play('andar', true);
         } else if (this.anims.currentAnim?.key !== 'pulo') {
@@ -107,7 +111,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private andarParaEsquerda() {
         this.carregandoPulo = false;
         this.setVelocityX(-this.velX);
-        if (this.body!.touching.down) {
+        if (this.body!.onFloor()) {
             // if (!this.andarSFX.isPlaying) this.andarSFX.play();
             this.anims.play('andar', true);
         } else if (this.anims.currentAnim?.key !== 'pulo') {
