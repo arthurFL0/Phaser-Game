@@ -14,6 +14,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private LIMITE_PULO_1 : number = 300;
     private LIMITE_PULO_2 : number = 500;
     private LIMITE_PULO_3 : number = 800;
+    private renascendo = false;
     declare body: Phaser.Physics.Arcade.Body;
     // private diferencaLagrimasPe: number = 0;
 
@@ -41,7 +42,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.puloSFX = this.scene.sound.add('puloMP3');
-        this.puloSFX.setVolume(0.2);
+        this.puloSFX.setVolume(0.1);
         // this.andarSFX.setVolume(0.4);
     }
 
@@ -88,10 +89,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(- this.puloForca);
         }
 
-
-        // if (this.body!.velocity.y > 0 && !this.body!.touching.down) {
-        //     this.setFrame(11);
-        // }
+        const alturaMapa = this.scene.physics.world.bounds.height;
+      
+        if (this.y > alturaMapa - 80 && !this.renascendo) {
+            this.renascendo = true;
+            this.scene.events.emit('jogadorCaiu');
+        }
     }
 
     private andarParaDireita() {
@@ -181,5 +184,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 repeat: -1
             });
         }
+    }
+
+    public get getRenascendo() : boolean {
+        return this.renascendo;
+    }
+
+    public set setRenascendo(valor: boolean) {
+        this.renascendo = valor;
     }
 }
