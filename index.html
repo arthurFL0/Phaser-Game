@@ -7,7 +7,15 @@
     <link rel="stylesheet" href="/style.css">
     <title>Phaser - Template</title>
 </head>
-
+<style>
+    canvas {
+        /* Desativa filtros de desfoque nos navegadores */
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated; 
+    }
+</style>
 <body>
     <div id="app">
         <div id="game-container"></div>

@@ -6,12 +6,14 @@ export class Game extends Scene
     private player: Player;
     private platforms: any;
     private vidaText: GameObjects.BitmapText;
+    private fullscreenText: GameObjects.BitmapText;
     private alturaMapa: number;
     private larguraMapa: number;
     private montanha: Phaser.GameObjects.TileSprite;
     private ceu: Phaser.GameObjects.TileSprite;
     private posicaoInicial = { x: 50, y: 400 };
     private alturaExtraMapa = 100;
+    private gameCamera!: Phaser.Cameras.Scene2D.Camera;
 
     constructor ()
     {
@@ -37,20 +39,42 @@ export class Game extends Scene
 
         this.player = new Player(this, this.posicaoInicial.x, this.posicaoInicial.y);
         this.vidaText = this.add.bitmapText(10, 10, 'milky-font', 'Vida: 3', 16);
+        this.fullscreenText = this.add.bitmapText(320, 180, 'milky-font', 'Pressione F11 para Fullscreen', 24).setOrigin(0.5);
+        this.fullscreenText.setVisible(!this.scale.isFullscreen);
 
         this.physics.world.setBounds(0, 0, this.larguraMapa, this.alturaMapa + this.alturaExtraMapa);
 
-        // Limita a câmera (para ela não filmar fora do mapa)
-        this.cameras.main.setBounds(0, 0, this.larguraMapa, this.alturaMapa);
+        // --------------------------------------------------------
+        // CÂMERA DO JOGO 
+        // ---------------------------------------------------------
+        this.gameCamera = this.cameras.add(0, 0, 640, 360);
+        this.gameCamera.setZoom(2); // Aplica o zoom apenas aqui
 
-        // Configura o Follow
-        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
 
-        // Cria um retângulo de 100x50 pixels no meio da tela onde o jogador se move solto
-        this.cameras.main.setDeadzone(100, 50);
+        this.gameCamera.setBounds(0, 0, this.larguraMapa, this.alturaMapa);
+        this.gameCamera.startFollow(this.player, true, 0.08, 0.08);
+        this.gameCamera.setDeadzone(15, 40);
 
-        // Informa que este elemento não deve se mover quando a câmera avançar
-        this.vidaText.setScrollFactor(0);
+        this.gameCamera.ignore([this.ceu, this.montanha, this.vidaText, this.fullscreenText]);
+
+        // ---------------------------------------------------------
+        // CÂMERA DE INTERFACE / UI 
+        // ---------------------------------------------------------
+        const uiCamera = this.cameras.add(0, 0, 640, 360);
+
+        uiCamera.ignore([this.ceu, this.montanha, this.player, this.platforms]);
+
+        // Listener para detectar mudança de Fullscreen
+        const checarJanela = () => {
+            const isFullscreen = window.innerHeight === window.screen.height;
+            this.fullscreenText.setVisible(!isFullscreen);
+        };
+
+        window.addEventListener('resize', checarJanela);
+   
+        this.events.once('shutdown', () => {
+            window.removeEventListener('resize', checarJanela);
+        });
 
         this.physics.add.collider(this.player, this.platforms);
         this.events.on('jogadorCaiu', () => {
@@ -61,7 +85,7 @@ export class Game extends Scene
     }
 
     update (time: number, delta: number){
-        const cameraX = this.cameras.main.scrollX;
+        const cameraX = this.gameCamera.scrollX;
 
         // Céu em efeito parallax com a câmera E um movimento extra baseado no tempo
         // 0.05 é a velocidade do parallax, 0.01 é a velocidade do baseada no relógio interno de atualização 
@@ -75,13 +99,13 @@ export class Game extends Scene
         this.player.body!.enable = false;
         this.player.setVelocity(0, 0);
 
-        this.cameras.main.fadeOut(250, 0, 0, 0);
+        this.gameCamera.fadeOut(250, 0, 0, 0);
 
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+        this.gameCamera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             
             this.player.setPosition(this.posicaoInicial.x, this.posicaoInicial.y);
 
-            this.cameras.main.fadeIn(500, 0, 0, 0);
+            this.gameCamera.fadeIn(500, 0, 0, 0);
 
             this.player.body.enable = true;
             this.player.setRenascendo = false;

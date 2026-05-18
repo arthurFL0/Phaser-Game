@@ -4,10 +4,10 @@ import Phaser from 'phaser';
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private carregandoPulo: boolean = false;
-    private velX: number = 130;
-    private velXAr: number = 100;
+    private velX: number = 60;
+    private velXAr: number = 30;
     private puloForca: number = 150;
-    private carregarPuloMax: number = 280;
+    private carregarPuloMax: number = 220;
     private pixelAzul: Phaser.GameObjects.Rectangle;
     // private andarSFX: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound = this.scene.sound.add('andarMP3');
     private puloSFX: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound
@@ -27,10 +27,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.pixelAzul = scene.add.rectangle(x, y, 5, 5, 0x4290f5);
         this.pixelAzul.setVisible(false);
         
-        this.setScale(3);
+        // this.setScale(3);
         // this.setBounce(0.2);
         this.setCollideWorldBounds(true);
-        this.body!.setSize(5, 29);
+        this.body!.setSize(5, 28);
         this.body!.setOffset(6, 0);
 
         this.criarAnimacoes(scene);
@@ -95,6 +95,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.renascendo = true;
             this.scene.events.emit('jogadorCaiu');
         }
+
+      
     }
 
     private andarParaDireita() {
