@@ -5,6 +5,8 @@ export class Game extends Scene
 {
     private player: Player;
     private platforms: any;
+    private decoracoes: any;
+    private decoracao_fundo: any;
     private vidaText: GameObjects.BitmapText;
     private fullscreenText: GameObjects.BitmapText;
     private alturaMapa: number;
@@ -28,8 +30,12 @@ export class Game extends Scene
 
         const map = this.make.tilemap({ key: 'mapa_fase1' });
         const tileset = map.addTilesetImage('mapa-spritesheet', 'mapa_spritesheet');
-        if(tileset)
-            this.platforms = map.createLayer('Camada de Blocos 1', tileset, 0, 0);
+        if(tileset){
+            this.decoracoes = map.createLayer('decoracao', tileset, 0, 0);
+            this.decoracao_fundo = map.createLayer('decoracao_fundo', tileset, 0, 0);
+            this.platforms = map.createLayer('principal', tileset, 0, 0);
+            this.decoracao_fundo.setDepth(10);
+        }
 
         this.larguraMapa = map.widthInPixels;
         this.alturaMapa = map.heightInPixels;

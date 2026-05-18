@@ -21,6 +21,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'boris');
         
+        this.setDepth(5);
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
