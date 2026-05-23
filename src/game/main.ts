@@ -1,7 +1,7 @@
 import { Boot } from './scenes/Boot';
 import { GameOver } from './scenes/GameOver';
 import { Game as MainGame } from './scenes/Game';
-import { AUTO, Game } from 'phaser';
+import { Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
 
 const GAME_WIDTH = 640;  
@@ -24,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { x: 0, y: 300 },
-            debug: false
+            debug: true
         }
     },
     scene: [

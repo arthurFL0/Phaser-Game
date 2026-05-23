@@ -42,7 +42,11 @@ export class Preloader extends Scene
         this.load.image('montanha','montanha.png');
         this.load.image('ceu', 'ceu.png');
         this.load.bitmapFont('milky-font', 'font.png', 'font.xml');
-        this.load.image('mapa_spritesheet', '/tile/mapa-spritesheet.png');
+        // this.load.image('mapa_spritesheet', '/tile/mapa-spritesheet.png');
+        this.load.spritesheet('mapa_spritesheet', '/tile/mapa-spritesheet.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        });
         this.load.tilemapTiledJSON('mapa_fase1','/tile/boris_mapa1.json');
 
     }
