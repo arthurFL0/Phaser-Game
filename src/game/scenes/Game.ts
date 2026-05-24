@@ -8,7 +8,6 @@ export class Game extends Scene
     private decoracoes: any;
     private decoracao_fundo: any;
     private grupoColisoes: any;
-    private vidaText: GameObjects.BitmapText;
     private fullscreenText: GameObjects.BitmapText;
     private alturaMapa: number;
     private larguraMapa: number;
@@ -28,6 +27,10 @@ export class Game extends Scene
 
         this.ceu = this.add.tileSprite(0,0,640,360, 'ceu').setOrigin(0,0).setScrollFactor(0);
         this.montanha = this.add.tileSprite(0,0,640,360, 'montanha').setOrigin(0,0).setScrollFactor(0);
+
+        // Força renderização sem antialiasing 
+        this.ceu.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        this.montanha.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
         const map = this.make.tilemap({ key: 'mapa_fase1' });
         const tileset = map.addTilesetImage('mapa-spritesheet', 'mapa_spritesheet');
@@ -50,9 +53,16 @@ export class Game extends Scene
 
 
         this.player = new Player(this, this.posicaoInicial.x, this.posicaoInicial.y);
-        this.vidaText = this.add.bitmapText(10, 10, 'milky-font', 'Vida: 3', 16);
         this.fullscreenText = this.add.bitmapText(320, 180, 'milky-font', 'Pressione F11 para Fullscreen', 24).setOrigin(0.5);
-        this.fullscreenText.setVisible(!this.scale.isFullscreen);
+
+        // Listener para detectar mudança de Fullscreen (API e F11)
+        const checarJanela = () => {
+            const isFullscreen = this.scale.isFullscreen || (window.innerHeight === window.screen.height);
+            this.fullscreenText.setVisible(!isFullscreen);
+        };
+
+        // Executa imediatamente para garantir o estado inicial correto
+        checarJanela();
 
         this.physics.world.setBounds(0, 0, this.larguraMapa, this.alturaMapa + this.alturaExtraMapa);
 
@@ -67,7 +77,7 @@ export class Game extends Scene
         this.gameCamera.startFollow(this.player, true, 0.08, 0.08);
         this.gameCamera.setDeadzone(15, 40);
 
-        this.gameCamera.ignore([this.ceu, this.montanha, this.vidaText, this.fullscreenText]);
+        this.gameCamera.ignore([this.ceu, this.montanha, this.fullscreenText]);
 
         // ---------------------------------------------------------
         // CÂMERA DE INTERFACE / UI 
@@ -76,16 +86,13 @@ export class Game extends Scene
 
         uiCamera.ignore([this.ceu, this.montanha, this.player, this.platforms]);
 
-        // Listener para detectar mudança de Fullscreen
-        const checarJanela = () => {
-            const isFullscreen = window.innerHeight === window.screen.height;
-            this.fullscreenText.setVisible(!isFullscreen);
-        };
-
+        // Eventos de redimensionamento e Fullscreen
         window.addEventListener('resize', checarJanela);
+        this.scale.on('fullscreenchange', checarJanela);
    
         this.events.once('shutdown', () => {
             window.removeEventListener('resize', checarJanela);
+            this.scale.off('fullscreenchange', checarJanela);
         });
 
         this.physics.add.collider(this.player, this.grupoColisoes);

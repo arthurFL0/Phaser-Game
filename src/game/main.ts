@@ -3,6 +3,7 @@ import { GameOver } from './scenes/GameOver';
 import { Game as MainGame } from './scenes/Game';
 import { Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
+import { Menu } from './scenes/Menu';
 
 const GAME_WIDTH = 640;  
 const GAME_HEIGHT = 360; 
@@ -13,6 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: GAME_HEIGHT,
     pixelArt: true,
     roundPixels: true,
+    antialias: false,
 
     scale: {
         mode: Phaser.Scale.NONE, 
@@ -24,12 +26,13 @@ const config: Phaser.Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { x: 0, y: 300 },
-            debug: true
+            debug: false
         }
     },
     scene: [
         Boot,
         Preloader,
+        Menu,
         MainGame,
         GameOver
     ]
