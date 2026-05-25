@@ -13,9 +13,10 @@ export class Game extends Scene
     private larguraMapa: number;
     private montanha: Phaser.GameObjects.TileSprite;
     private ceu: Phaser.GameObjects.TileSprite;
-    private posicaoInicial = { x: 50, y: 400 };
+    private posicaoInicial = { x: 50, y: 500 };
     private alturaExtraMapa = 100;
     private gameCamera!: Phaser.Cameras.Scene2D.Camera;
+    private finalizandoFase = false;
 
     constructor ()
     {
@@ -24,6 +25,7 @@ export class Game extends Scene
 
     create ()
     {
+        this.finalizandoFase = false;
 
         this.ceu = this.add.tileSprite(0,0,640,360, 'ceu').setOrigin(0,0).setScrollFactor(0);
         this.montanha = this.add.tileSprite(0,0,640,360, 'montanha').setOrigin(0,0).setScrollFactor(0);
@@ -35,6 +37,7 @@ export class Game extends Scene
         const map = this.make.tilemap({ key: 'mapa_fase1' });
         const tileset = map.addTilesetImage('mapa-spritesheet', 'mapa_spritesheet');
         if(tileset){
+            map.createLayer('decoracao_2',tileset,0,0);
             this.decoracoes = map.createLayer('decoracao', tileset, 0, 0);
             this.decoracao_fundo = map.createLayer('decoracao_fundo', tileset, 0, 0);
             this.platforms = map.createLayer('principal', tileset, 0, 0);
@@ -64,7 +67,8 @@ export class Game extends Scene
         // Executa imediatamente para garantir o estado inicial correto
         checarJanela();
 
-        this.physics.world.setBounds(0, 0, this.larguraMapa, this.alturaMapa + this.alturaExtraMapa);
+        // Expande o limite do mundo para passar da borda no mapa no fim
+        this.physics.world.setBounds(0, 0, this.larguraMapa + 200, this.alturaMapa + this.alturaExtraMapa);
 
         // --------------------------------------------------------
         // CÂMERA DO JOGO 
@@ -76,6 +80,8 @@ export class Game extends Scene
         this.gameCamera.setBounds(0, 0, this.larguraMapa, this.alturaMapa);
         this.gameCamera.startFollow(this.player, true, 0.08, 0.08);
         this.gameCamera.setDeadzone(15, 40);
+        
+        this.gameCamera.centerOn(this.posicaoInicial.x, this.posicaoInicial.y - 25);
 
         this.gameCamera.ignore([this.ceu, this.montanha, this.fullscreenText]);
 
@@ -112,6 +118,15 @@ export class Game extends Scene
         
         // A montanha continua com o efeito parallax normal
         this.montanha.tilePositionX = Math.round(cameraX * 0.1);
+
+        if (this.player.x > this.larguraMapa && !this.finalizandoFase) {
+            this.finalizandoFase = true;
+            this.player.destroy();
+            this.gameCamera.fadeOut(1000, 0, 0, 0); // Fade out de 1 segundo para preto
+            this.gameCamera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                this.scene.start('Fim');
+            });
+        }
     }
 
     private resetarJogadorComFade() {
@@ -123,6 +138,9 @@ export class Game extends Scene
         this.gameCamera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             
             this.player.setPosition(this.posicaoInicial.x, this.posicaoInicial.y);
+            
+            // Força a câmera a focar na mesma posição inicial imediatamente ao resetar
+            this.gameCamera.centerOn(this.posicaoInicial.x, this.posicaoInicial.y - 25);
 
             this.gameCamera.fadeIn(500, 0, 0, 0);
 

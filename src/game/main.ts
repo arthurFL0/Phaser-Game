@@ -4,6 +4,7 @@ import { Game as MainGame } from './scenes/Game';
 import { Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
 import { Menu } from './scenes/Menu';
+import { Fim } from './scenes/Fim';
 
 const GAME_WIDTH = 640;  
 const GAME_HEIGHT = 360; 
@@ -34,6 +35,7 @@ const config: Phaser.Types.Core.GameConfig = {
         Preloader,
         Menu,
         MainGame,
+        Fim,
         GameOver
     ]
 };

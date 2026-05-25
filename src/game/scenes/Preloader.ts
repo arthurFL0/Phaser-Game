@@ -53,8 +53,9 @@ export class Preloader extends Scene
         this.load.image('tela_inicio', 'tela_inicio.png');
         this.load.image('botaoJogar', 'botaoJogar.png');
         this.load.image('scroll_bg', 'Scroll.png');
-        this.load.image('press_enter', 'PRESSIONE_ENTER.png');
-    }
+        this.load.image('press_enter', 'PRESSIONE_ENTER.png');        
+        // Fim assets
+        this.load.image('tela_fim', 'tela-fim.png');    }
 
     create ()
     {

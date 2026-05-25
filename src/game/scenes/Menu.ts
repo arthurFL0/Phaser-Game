@@ -42,25 +42,33 @@ export class Menu extends Scene {
         const GAME_WIDTH = 640;
         const GAME_HEIGHT = 360;
 
-        this.telaInicio.destroy();
-        this.botaoJogar.destroy();
+        this.cameras.main.fadeOut(500, 0, 0, 0);
 
-        this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'scroll_bg');
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.telaInicio.destroy();
+            this.botaoJogar.destroy();
 
-        this.time.delayedCall(5000, () => {
-            const pressEnterText = this.add.image(540,300, 'press_enter');
-            
-            this.tweens.add({
-                targets: pressEnterText,
-                alpha: 0,
-                duration: 500,
-                ease: 'Linear',
-                yoyo: true,
-                repeat: -1
-            });
+            this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'scroll_bg');
+            this.cameras.main.fadeIn(500, 0, 0, 0);
 
-            this.input.keyboard?.once('keydown-ENTER', () => {
-                this.scene.start('Game');
+            this.time.delayedCall(5000, () => {
+                const pressEnterText = this.add.image(540,300, 'press_enter');
+                
+                this.tweens.add({
+                    targets: pressEnterText,
+                    alpha: 0,
+                    duration: 500,
+                    ease: 'Linear',
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                this.input.keyboard?.once('keydown-ENTER', () => {
+                    this.cameras.main.fadeOut(500, 0, 0, 0);
+                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                        this.scene.start('Game');
+                    });
+                });
             });
         });
     }
