@@ -2,37 +2,66 @@
 import { Scene } from 'phaser';
 
 export class Menu extends Scene {
+    private telaInicio!: Phaser.GameObjects.Image;
+    private botaoJogar!: Phaser.GameObjects.Image;
+    private gameStarting: boolean = false;
+
     constructor() {
         super('Menu');
     }
 
     create() {
+        this.gameStarting = false;
         const GAME_WIDTH = 640;
         const GAME_HEIGHT = 360;
 
-        this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'tela_inicio');
+        this.telaInicio = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'tela_inicio');
 
-        const playButton = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'botaoJogar')
+        this.botaoJogar = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'botaoJogar')
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.startGame();
+                if (!this.gameStarting) this.showScroll();
             });
 
         // Hover
-        playButton.on('pointerover', () => {
-            playButton.setTint(0xdddddd);
+        this.botaoJogar.on('pointerover', () => {
+            this.botaoJogar.setTint(0xdddddd);
         });
         
-        playButton.on('pointerout', () => {
-            playButton.clearTint();
+        this.botaoJogar.on('pointerout', () => {
+            this.botaoJogar.clearTint();
         });
 
-        this.input.keyboard?.on('keydown-ENTER', () => {
-            this.startGame();
+        this.input.keyboard?.once('keydown-ENTER', () => {
+            if (!this.gameStarting) this.showScroll();
         });
     }
 
-    startGame() {
-        this.scene.start('Game');
+    showScroll() {
+        this.gameStarting = true;
+        const GAME_WIDTH = 640;
+        const GAME_HEIGHT = 360;
+
+        this.telaInicio.destroy();
+        this.botaoJogar.destroy();
+
+        this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'scroll_bg');
+
+        this.time.delayedCall(5000, () => {
+            const pressEnterText = this.add.image(540,300, 'press_enter');
+            
+            this.tweens.add({
+                targets: pressEnterText,
+                alpha: 0,
+                duration: 500,
+                ease: 'Linear',
+                yoyo: true,
+                repeat: -1
+            });
+
+            this.input.keyboard?.once('keydown-ENTER', () => {
+                this.scene.start('Game');
+            });
+        });
     }
 }
