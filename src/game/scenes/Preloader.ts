@@ -31,11 +31,6 @@ export class Preloader extends Scene
     {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
-        this.load.image('sky', 'sky.png');
-        this.load.image('ground', 'platform.png');
-        this.load.image('star', 'star.png');
-        this.load.image('bomb', 'bomb.png');
-        this.load.image('logo', 'logo.png');
         this.load.spritesheet('boris', 'BorisAnim.png', {frameWidth: 14, frameHeight: 28});
         this.load.audio('puloMP3','/sfx/pulo.mp3');
         this.load.audio('andarMP3','/sfx/passo.mp3');
@@ -55,7 +50,12 @@ export class Preloader extends Scene
         this.load.image('scroll_bg', 'Scroll.png');
         this.load.image('press_enter', 'PRESSIONE_ENTER.png');        
         // Fim assets
-        this.load.image('tela_fim', 'tela-fim.png');    }
+        this.load.image('tela_fim', 'tela-fim.png');   
+        
+        //musica
+        this.load.audio('musica', '/musica/crystal_caves.mp3');
+    
+    }
 
     create ()
     {

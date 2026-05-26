@@ -60,7 +60,10 @@ export class Game extends Scene
 
         // Listener para detectar mudança de Fullscreen (API e F11)
         const checarJanela = () => {
-            const isFullscreen = this.scale.isFullscreen || (window.innerHeight === window.screen.height);
+            // Verifica o modo tela cheia pela API do Phaser, documento HTML ou resolução da janela (com margem de erro)
+            const isFullscreen = this.scale.isFullscreen || 
+                                 document.fullscreenElement !== null || 
+                                 Math.abs(window.innerHeight - window.screen.height) <= 5;
             this.fullscreenText.setVisible(!isFullscreen);
         };
 
@@ -105,7 +108,9 @@ export class Game extends Scene
         this.events.on('jogadorCaiu', () => {
         this.resetarJogadorComFade(); // 
         });
-
+        
+        this.sound.play('musica', { loop: true, volume: 0.2 });
+        
 
     }
 
@@ -124,6 +129,7 @@ export class Game extends Scene
             this.player.destroy();
             this.gameCamera.fadeOut(1000, 0, 0, 0); // Fade out de 1 segundo para preto
             this.gameCamera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                this.sound.stopByKey('musica');
                 this.scene.start('Fim');
             });
         }
