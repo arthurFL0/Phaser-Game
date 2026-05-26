@@ -19,7 +19,10 @@ export class Menu extends Scene {
 
         this.botaoJogar = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'botaoJogar')
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
+            .on('pointerup', () => {
+                if (!this.scale.isFullscreen) {
+                    this.scale.startFullscreen();
+                }
                 if (!this.gameStarting) this.showScroll();
             });
 

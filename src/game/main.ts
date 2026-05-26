@@ -18,7 +18,7 @@ const config: Phaser.Types.Core.GameConfig = {
     antialias: false,
 
     scale: {
-        mode: Phaser.Scale.NONE, 
+        mode: Phaser.Scale.FIT, 
         autoCenter: Phaser.Scale.CENTER_BOTH, 
     },
     parent: 'game-container',
@@ -43,27 +43,6 @@ const config: Phaser.Types.Core.GameConfig = {
 const StartGame = (parent: string) => {
 
     const game = new Game({ ...config, parent });
-
-    const redimensionarPerfeitamente = () => {
-        const canvas = game.canvas;
-        if (!canvas) return;
-
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-
-        const scaleX = windowWidth / GAME_WIDTH;
-        const scaleY = windowHeight / GAME_HEIGHT;
-
-        let scale = Math.floor(Math.min(scaleX, scaleY));
-        if (scale < 1) scale = 1;
-
-        canvas.style.width = `${GAME_WIDTH * scale}px`;
-        canvas.style.height = `${GAME_HEIGHT * scale}px`;
-    };
-
-    window.addEventListener('resize', redimensionarPerfeitamente);
-    
-    setTimeout(redimensionarPerfeitamente, 100);
 
     return game;
 }
