@@ -86,7 +86,7 @@ export class Game extends Scene
         this.resetarJogadorComFade(); // 
         });
         
-        this.sound.play('musica', { loop: true, volume: 0.2 });
+        this.sound.play('musica', { loop: true, volume: 0.15 });
         
 
     }
