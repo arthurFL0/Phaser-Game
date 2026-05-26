@@ -77,8 +77,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.anims.play('pulo');
                 this.setVelocityY(- this.calcularPulo(tempoPressionado));
         } else if (this.body.onFloor()) {
-            this.anims.stop();
-            this.setFrame(0);
+            if (this.anims.currentAnim?.key !== 'pulo' || this.body.velocity.y >= 0) {
+                this.anims.stop();
+                this.setFrame(0);
+            }
         } else if (this.anims.currentAnim?.key !== 'carregar_pulo' && this.anims.currentAnim?.key !== 'pulo') {
             this.anims.stop();
             this.setFrame(0);

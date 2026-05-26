@@ -35,7 +35,10 @@ export class Menu extends Scene {
             this.botaoJogar.clearTint();
         });
 
-        this.input.keyboard?.once('keydown-ENTER', () => {
+        this.input.keyboard?.once('keyup-ENTER', () => {
+            if (!this.scale.isFullscreen) {
+                this.scale.startFullscreen();
+            }
             if (!this.gameStarting) this.showScroll();
         });
     }
