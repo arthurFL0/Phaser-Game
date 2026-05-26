@@ -60,16 +60,21 @@ export class Game extends Scene
 
         // Listener para detectar mudança de Fullscreen (API e F11)
         const checarJanela = () => {
-            // Verifica o modo tela cheia pela API do Phaser, documento HTML ou resolução da janela (com margem de erro)
+            // Verifica o modo tela cheia pela API do Phaser, documento HTML ou resolução da janela
             const isFullscreen = this.scale.isFullscreen || 
                                  document.fullscreenElement !== null || 
-                                 Math.abs(window.innerHeight - window.screen.height) <= 5;
+                                 (window.innerWidth === screen.width && window.innerHeight === screen.height);
             this.fullscreenText.setVisible(!isFullscreen);
         };
 
         // Executa imediatamente para garantir o estado inicial correto
         checarJanela();
-
+        
+        const onFullscreenChange = () => checarJanela();
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+        document.addEventListener('mozfullscreenchange', onFullscreenChange);
+        document.addEventListener('msfullscreenchange', onFullscreenChange);
         // Expande o limite do mundo para passar da borda no mapa no fim
         this.physics.world.setBounds(0, 0, this.larguraMapa + 200, this.alturaMapa + this.alturaExtraMapa);
 
@@ -102,6 +107,10 @@ export class Game extends Scene
         this.events.once('shutdown', () => {
             window.removeEventListener('resize', checarJanela);
             this.scale.off('fullscreenchange', checarJanela);
+            document.removeEventListener('fullscreenchange', checarJanela);
+            document.removeEventListener('webkitfullscreenchange', checarJanela);
+            document.removeEventListener('mozfullscreenchange', checarJanela);
+            document.removeEventListener('msfullscreenchange', checarJanela);
         });
 
         this.physics.add.collider(this.player, this.grupoColisoes);
