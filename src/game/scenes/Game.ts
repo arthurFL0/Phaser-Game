@@ -8,7 +8,6 @@ export class Game extends Scene
     private decoracoes: any;
     private decoracao_fundo: any;
     private grupoColisoes: any;
-    private fullscreenText: GameObjects.BitmapText;
     private alturaMapa: number;
     private larguraMapa: number;
     private montanha: Phaser.GameObjects.TileSprite;
@@ -56,19 +55,6 @@ export class Game extends Scene
 
 
         this.player = new Player(this, this.posicaoInicial.x, this.posicaoInicial.y);
-        this.fullscreenText = this.add.bitmapText(320, 180, 'milky-font', 'Pressione F11 para Fullscreen', 24).setOrigin(0.5);
-
-        // Listener para detectar mudança de Fullscreen (API e F11)
-        const checarJanela = () => {
-            // Verifica o modo tela cheia pela API do Phaser, documento HTML ou resolução da janela (com margem de erro)
-            const isFullscreen = this.scale.isFullscreen || 
-                                 document.fullscreenElement !== null || 
-                                 Math.abs(window.innerHeight - window.screen.height) <= 5;
-            this.fullscreenText.setVisible(!isFullscreen);
-        };
-
-        // Executa imediatamente para garantir o estado inicial correto
-        checarJanela();
 
         // Expande o limite do mundo para passar da borda no mapa no fim
         this.physics.world.setBounds(0, 0, this.larguraMapa + 200, this.alturaMapa + this.alturaExtraMapa);
@@ -86,7 +72,7 @@ export class Game extends Scene
         
         this.gameCamera.centerOn(this.posicaoInicial.x, this.posicaoInicial.y - 25);
 
-        this.gameCamera.ignore([this.ceu, this.montanha, this.fullscreenText]);
+        this.gameCamera.ignore([this.ceu, this.montanha]);
 
         // ---------------------------------------------------------
         // CÂMERA DE INTERFACE / UI 
@@ -94,15 +80,6 @@ export class Game extends Scene
         const uiCamera = this.cameras.add(0, 0, 640, 360);
 
         uiCamera.ignore([this.ceu, this.montanha, this.player, this.platforms]);
-
-        // Eventos de redimensionamento e Fullscreen
-        window.addEventListener('resize', checarJanela);
-        this.scale.on('fullscreenchange', checarJanela);
-   
-        this.events.once('shutdown', () => {
-            window.removeEventListener('resize', checarJanela);
-            this.scale.off('fullscreenchange', checarJanela);
-        });
 
         this.physics.add.collider(this.player, this.grupoColisoes);
         this.events.on('jogadorCaiu', () => {
