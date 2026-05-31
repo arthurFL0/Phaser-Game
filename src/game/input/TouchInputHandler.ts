@@ -4,7 +4,7 @@ import { InputHandler, InputState } from './InputHandler';
 interface ButtonConfig {
     x: number; y: number;
     width: number; height: number;
-    label: string;
+    angle: number;
     key: 'left' | 'right' | 'up' | 'down';
 }
 
@@ -12,18 +12,17 @@ export class TouchInputHandler implements InputHandler {
     private scene: Phaser.Scene;
     private buttonStates: Map<string, {
         rect: Phaser.Geom.Rectangle;
-        bg: Phaser.GameObjects.Rectangle;
-        label: Phaser.GameObjects.Text;
+        icon: Phaser.GameObjects.Sprite;
         pressed: boolean;
         pressedAt: number;
     }> = new Map();
     private prevDownDown = false;
 
     private readonly BUTTON_CONFIGS: ButtonConfig[] = [
-        { key: 'left',  label: '◀', x: 60,  y: -100, width: 70, height: 70 },
-        { key: 'right', label: '▶', x: 140, y: -100, width: 70, height: 70 },
-        { key: 'up',    label: '▲', x: -80, y: -100, width: 70, height: 70 },
-        { key: 'down',  label: '▼', x: -80, y: -170, width: 70, height: 70 },
+        { key: 'left',  angle: 0,   x: 60,  y: -60, width: 70, height: 70 },
+        { key: 'right', angle: 180, x: 140, y: -60, width: 70, height: 70 },
+        { key: 'up',    angle: 90,  x: -80, y: -100, width: 70, height: 70 },
+        { key: 'down',  angle: -90, x: -80, y: -170, width: 70, height: 70 },
     ];
 
     constructor(scene: Phaser.Scene) {
@@ -40,16 +39,14 @@ export class TouchInputHandler implements InputHandler {
             const px = cfg.x >= 0 ? cfg.x : width  + cfg.x;
             const py = cfg.y >= 0 ? cfg.y : height + cfg.y;
 
-            const bg = this.scene.add
-                .rectangle(px, py, cfg.width, cfg.height, 0xffffff, 0.25)
-                .setScrollFactor(0)       
-                .setDepth(100);
-
-            const label = this.scene.add
-                .text(px, py, cfg.label, { fontSize: '28px', color: '#ffffff' })
+            const icon = this.scene.add
+                .sprite(px, py, 'input_seta')
                 .setOrigin(0.5)
+                .setAngle(cfg.angle)
                 .setScrollFactor(0)
-                .setDepth(101);
+                .setDepth(101)
+                .setAlpha(1)
+                .setScale(2);
 
             const rect = new Phaser.Geom.Rectangle(
                 px - cfg.width  / 2,
@@ -59,7 +56,7 @@ export class TouchInputHandler implements InputHandler {
             );
 
             this.buttonStates.set(cfg.key, {
-                rect, bg, label,
+                rect, icon,
                 pressed: false,
                 pressedAt: 0,
             });
@@ -86,10 +83,10 @@ export class TouchInputHandler implements InputHandler {
             if (hit && !btn.pressed) {
                 btn.pressed = true;
                 btn.pressedAt = now;
-                btn.bg.setFillStyle(0xffffff, 0.5);
+                btn.icon.setAlpha(0.6);
             } else if (!hit && btn.pressed) {
                 btn.pressed = false;
-                btn.bg.setFillStyle(0xffffff, 0.25);
+                btn.icon.setAlpha(1);
             }
         }
     }
@@ -117,9 +114,8 @@ export class TouchInputHandler implements InputHandler {
         this.scene.input.off('pointerdown', this.updateAllButtons, this);
         this.scene.input.off('pointerup',   this.updateAllButtons, this);
 
-        this.buttonStates.forEach(({ bg, label }) => {
-            bg.destroy();
-            label.destroy();
+        this.buttonStates.forEach(({ icon }) => {
+            icon.destroy();
         });
         this.buttonStates.clear();
     }

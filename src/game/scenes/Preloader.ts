@@ -51,6 +51,9 @@ export class Preloader extends Scene
         this.load.image('press_enter', 'PRESSIONE_ENTER.png');        
         // Fim assets
         this.load.image('tela_fim', 'tela-fim.png');   
+
+        // Seta do input
+        this.load.spritesheet('input_seta', 'input_seta.png', {frameWidth: 20, frameHeight: 16});
         
         //musica
         this.load.audio('musica', '/musica/crystal_caves.mp3');
