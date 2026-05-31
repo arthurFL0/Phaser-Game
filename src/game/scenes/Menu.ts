@@ -69,12 +69,17 @@ export class Menu extends Scene {
                     repeat: -1
                 });
 
-                this.input.keyboard?.once('keydown-ENTER', () => {
+                const startGame = () => {
+                    this.input.keyboard?.off('keydown-ENTER', startGame);
+                    this.input.off('pointerdown', startGame);
                     this.cameras.main.fadeOut(500, 0, 0, 0);
                     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
                         this.scene.start('Game');
                     });
-                });
+                };
+
+                this.input.keyboard?.once('keydown-ENTER', startGame);
+                this.input.once('pointerdown', startGame);
             });
         });
     }
