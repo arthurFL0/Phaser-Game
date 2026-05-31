@@ -21,8 +21,8 @@ export class TouchInputHandler implements InputHandler {
     private readonly BUTTON_CONFIGS: ButtonConfig[] = [
         { key: 'left',  angle: 0,   x: 60,  y: -60, width: 70, height: 70 },
         { key: 'right', angle: 180, x: 140, y: -60, width: 70, height: 70 },
-        { key: 'up',    angle: 90,  x: -80, y: -100, width: 70, height: 70 },
-        { key: 'down',  angle: -90, x: -80, y: -170, width: 70, height: 70 },
+        { key: 'up',    angle: 90,  x: -120, y: -140, width: 70, height: 70 },
+        { key: 'down',  angle: -90, x: -60, y: -140, width: 70, height: 70 },
     ];
 
     constructor(scene: Phaser.Scene) {
