@@ -1,5 +1,6 @@
 
 import Phaser from 'phaser';
+import { createInputHandler, InputHandler } from '../input/InputHandler';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -15,12 +16,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private LIMITE_PULO_2 : number = 500;
     private LIMITE_PULO_3 : number = 800;
     private renascendo = false;
+    private inputJogador: InputHandler;
+
     declare body: Phaser.Physics.Arcade.Body;
     // private diferencaLagrimasPe: number = 0;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'boris');
-        
+        this.inputJogador = createInputHandler(scene);
+
         this.setDepth(5);
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -47,35 +51,40 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // this.andarSFX.setVolume(0.4);
     }
 
+    destroy(fromScene?: boolean) {
+        this.inputJogador.destroy(); 
+        super.destroy(fromScene);
+    }
+
     // É chamado pelo Scene adicionado automaticamente a cada frame 
     preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta);
-        if (!this.cursors) return;
+
+         const { left, right, up, down, downDuration, downJustReleased } =
+            this.inputJogador.getState();
 
 
         this.setVelocityX(0); 
 
         // Lógica do pulo e andar
-        if (this.cursors.right?.isDown) {
+        if (right) {
             this.andarParaDireita();
-        } else if (this.cursors.left?.isDown) {
+        } else if (left) {
             this.andarParaEsquerda();
-        } else if (this.cursors.down?.isDown && this.body.onFloor()) {
-            const tempoPressionado = this.cursors.down.getDuration();
+        } else if (down && this.body.onFloor()) {
             this.carregandoPulo = true;
-            if(tempoPressionado >= this.LIMITE_PULO_3){
+            if(downDuration >= this.LIMITE_PULO_3){
                 this.animarLagrimas();
             }else if(this.anims.currentAnim?.key !== 'carregar_pulo'){
                 this.anims.play('carregar_pulo');
             }
 
-        } else if(Phaser.Input.Keyboard.JustUp(this.cursors.down) && this.body.onFloor() && this.carregandoPulo) {
+        } else if(downJustReleased && this.body.onFloor() && this.carregandoPulo) {
                 // this.pixelAzul.setVisible(false);
                 this.puloSFX.play();
-                const tempoPressionado = this.cursors.down.duration;
                 this.carregandoPulo = false;
                 this.anims.play('pulo');
-                this.setVelocityY(- this.calcularPulo(tempoPressionado));
+                this.setVelocityY(- this.calcularPulo(downDuration));
         } else if (this.body.onFloor()) {
             if (this.anims.currentAnim?.key !== 'pulo' || this.body.velocity.y >= 0) {
                 this.anims.stop();
@@ -86,7 +95,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setFrame(0);
         }
 
-        if (this.cursors.up?.isDown && this.body.onFloor()) {
+        if (up  && this.body.onFloor()) {
             this.puloSFX.play();
             this.anims.play('pulo');
             this.setVelocityY(- this.puloForca);
